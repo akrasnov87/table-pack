@@ -118,16 +118,16 @@ var pkg = require('./package.json');
                         allCsvSize += bufferCsv.byteLength;
 
                         var bufferCsvCompress = compress.encode(fileName, bufferCsv, args.compress);
-                        allSize += bufferCsvCompress.byteLength;
+                        allCsvCompressSize += bufferCsvCompress.byteLength;
                         fs.writeFileSync(join(tableCompressDir, fileName + '.zip'), bufferCsvCompress);
                         fileCount++;
-                        
+
                         rows = [headers.join('|')]
-                        console.log(i + '/' + total);
+                        console.log(i + '/' + total + " | " + toMb(allSize) + ";" + toMb(allCsvSize) + "("+toPercent(allSize, allCsvSize)+"%)" + ";" + toMb(allCsvCompressSize) + "("+toPercent(allCsvSize, allCsvCompressSize) + " - " + toPercent(allSize, allCsvCompressSize)+"%)");
                     }
                 } catch(e) {
                     i -= size;
-                    console.error(e.message);
+                    console.error(i + ': ' + e.message);
                 }
             }
 
@@ -141,3 +141,11 @@ var pkg = require('./package.json');
         console.error(e);
     }
 })();
+
+
+function toMb(num) {
+    return (num / 1024 / 1024).toFixed(2);
+}
+function toPercent(i, j) {
+    return (100 - ((j * 100) / i)).toFixed(2);
+}
