@@ -109,17 +109,17 @@ var pkg = require('./package.json');
 
                         var jsonStr = JSON.stringify(records);
                         var buffer = Buffer.from(jsonStr,'utf8');
-                        fs.writeFileSync(join(tableDir, fileName), buffer);
+                        fs.writeFileSync(join(tableDir, fileName, '.json'), buffer);
                         allSize+=buffer.byteLength;
 
                         var rowsStr = rows.join('\n');
                         var bufferCsv = Buffer.from(rowsStr,'utf8');
-                        fs.writeFileSync(join(tableCsvDir, fileName), bufferCsv);
+                        fs.writeFileSync(join(tableCsvDir, fileName, '.csv'), bufferCsv);
                         allCsvSize += bufferCsv.byteLength;
 
                         var bufferCsvCompress = compress.encode(fileName, bufferCsv, args.compress);
                         allCsvCompressSize += bufferCsvCompress.byteLength;
-                        fs.writeFileSync(join(tableCompressDir, fileName + '.zip'), bufferCsvCompress);
+                        fs.writeFileSync(join(tableCompressDir, fileName, '.zip'), bufferCsvCompress);
                         fileCount++;
 
                         rows = [headers.join('|')]
