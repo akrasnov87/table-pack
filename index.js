@@ -5,6 +5,7 @@ var join = require('path').join;
 var mkdir = require('mkdir-recursive');
 var compress = require('./modules/zip');
 var pkg = require('./package.json');
+const { resolve4 } = require('dns');
 
 // выполняем оценку загрузки
 (async function() {
@@ -19,6 +20,7 @@ var pkg = require('./package.json');
         }
         
         var authResult = await rpc.auth(args.url, args.login, args.password);
+        await timeout();
         var results = await rpc.request(args.url, authResult.token, items);
         if(!Array.isArray(results)) {
             console.error(results.details);
@@ -148,4 +150,12 @@ function toMb(num) {
 }
 function toPercent(i, j) {
     return (100 - ((j * 100) / i)).toFixed(2);
+}
+
+async function timeout() {
+    return await new Promise((resolve, reject) => {
+        setTimeout(function() {
+            resolve();
+        }, 1000);
+    });
 }
