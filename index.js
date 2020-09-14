@@ -135,7 +135,7 @@ var pkg = require('./package.json');
 
             fs.writeFileSync(join(tableDir, 'readme.txt'), readmeStr + '|' + allSize);
             fs.writeFileSync(join(tableCsvDir, 'readme.txt'), readmeStr + '|' + allCsvSize);
-            fs.writeFileSync(join(tableCompressDir, 'readme.txt'), readmeStr + '|' + allCompressSize);
+            fs.writeFileSync(join(tableCompressDir, 'readme.txt'), readmeStr + '|' + allCsvCompressSize);
         }
     } catch(e) {
         console.error(e);
