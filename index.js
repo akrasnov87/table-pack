@@ -12,7 +12,7 @@ const { resolve4 } = require('dns');
     try {
         var dir = join(__dirname, 'json');
         var dirCsv = join(__dirname, 'csv');
-        var dirCompress = join(__dirname, 'archive');
+        var dirCompress = join(__dirname, 'zip');
 
         var items = [{ "action": "Domain." + args.table, "method": "Query", "data": [{"limit": 1, "forceLimit": true}], "type": "rpc", "tid": 0 }];
         if(args.sort) {
