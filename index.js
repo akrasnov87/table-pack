@@ -9,7 +9,8 @@ var pkg = require('./package.json');
 // выполняем оценку загрузки
 (async function() {
     try {
-        var dir = join(__dirname, 'data');
+        var dir = join(__dirname, 'json');
+        var dirCsv = join(__dirname, 'csv');
         var dirCompress = join(__dirname, 'archive');
 
         var items = [{ "action": "Domain." + args.table, "method": "Query", "data": [{"limit": 1, "forceLimit": true}], "type": "rpc", "tid": 0 }];
@@ -24,7 +25,7 @@ var pkg = require('./package.json');
         } else {
             var birthday = pkg.birthday;
             var version = pkg.version.split('.');
-            var newVersion = version[0] + '.' + Math.floor(Math.abs(new Date().getTime() - new Date(birthday).getTime()) / (1000 * 3600 * 24)) + '.'
+            var newVersion = args.version || version[0] + '.' + Math.floor(Math.abs(new Date().getTime() - new Date(birthday).getTime()) / (1000 * 3600 * 24)) + '.'
                                                   + ((new Date().getHours() * 60) + new Date().getMinutes());
                                                   
             var total = results[0].result.total;
@@ -34,15 +35,24 @@ var pkg = require('./package.json');
                 mkdir.mkdirSync(dir);
             }
 
+            if(!fs.existsSync(dirCsv)) {
+                mkdir.mkdirSync(dirCsv);
+            }
+
             if(!fs.existsSync(dirCompress)) {
                 mkdir.mkdirSync(dirCompress);
             }
 
             var tableDir = join(dir, args.table, newVersion);
+            var tableCsvDir = join(dirCsv, args.table, newVersion);
             var tableCompressDir = join(dirCompress, args.table, newVersion);
 
             if(!fs.existsSync(tableDir)) {
                 mkdir.mkdirSync(tableDir);
+            }
+
+            if(!fs.existsSync(tableCsvDir)) {
+                mkdir.mkdirSync(tableCsvDir);
             }
 
             if(!fs.existsSync(tableCompressDir)) {
@@ -59,55 +69,72 @@ var pkg = require('./package.json');
             var rows = [headers.join('|')];
 
             var allSize = 0;
-            var allCompressSize = 0;
+            var allCsvSize = 0;
+            var allCsvCompressSize = 0;
             var fileCount = 0;
+            var start = args.start || 0;
 
-            for(var i = 0; i < total; i+=size) {
-                var item = items[0];
-                item.data[0].limit = size;
-                item.data[0].start = i;
-                
-                results = await rpc.request(args.url, authResult.token, items);
-                if(!Array.isArray(results)) {
-                    i -= size;
-                    console.error(results.details);
-                } else {
-                    var inner = [];
-                    var records = results[0].result.records;
-                    // выполняем преобразование
-                    for(var j = 0; j < records.length; j++) {
-                        var r = records[j];
-                        
-                        for(var k = 0; k < headers.length; k++) {
-                            var line = r[headers[k]];
-                            if(line == undefined || line == null) {
-                                line = '';
-                            }
+            for(var i = start; i < total; i+=size) {
+                try {
+                    var item = items[0];
+                    item.data[0].limit = size;
+                    item.data[0].start = i;
+                    
+                    results = await rpc.request(args.url, authResult.token, items);
+                    if(!Array.isArray(results)) {
+                        i -= size;
+                        console.error(results.details);
+                    } else {
+                        var inner = [];
+                        var records = results[0].result.records;
+                        // выполняем преобразование
+                        for(var j = 0; j < records.length; j++) {
+                            var r = records[j];
                             
-                            if(line.indexOf('|') >= 0) {
-                                line = line.replace(/|/gi, '/');
+                            for(var k = 0; k < headers.length; k++) {
+                                var line = r[headers[k]];
+                                if(line == undefined || line == null) {
+                                    line = '';
+                                }
+                                
+                                if(line.indexOf('|') >= 0) {
+                                    line = line.replace(/|/gi, '/');
+                                }
+                                inner.push(line);
                             }
-                            inner.push(line);
+                            rows.push(inner.join('|'));
+                            inner = [];
                         }
-                        rows.push(inner.join('|'));
-                        inner = [];
+                        var fileName = i + '-' + (i+size);
+
+                        var jsonStr = JSON.stringify(records);
+                        var buffer = Buffer.from(jsonStr,'utf8');
+                        fs.writeFileSync(join(tableDir, fileName), buffer);
+                        allSize+=buffer.byteLength;
+
+                        var rowsStr = rows.join('\n');
+                        var bufferCsv = Buffer.from(rowsStr,'utf8');
+                        fs.writeFileSync(join(tableCsvDir, fileName), bufferCsv);
+                        allCsvSize += bufferCsv.byteLength;
+
+                        var bufferCsvCompress = compress.encode(fileName, bufferCsv, args.compress);
+                        allSize += bufferCsvCompress.byteLength;
+                        fs.writeFileSync(join(tableCompressDir, fileName + '.zip'), bufferCsvCompress);
+                        fileCount++;
+                        
+                        rows = [headers.join('|')]
+                        console.log(i + '/' + total);
                     }
-                    var fileName = i + '-' + (i+size);
-                    fs.writeFileSync(join(tableDir, fileName), rows.join('\n'));
-                    var buffer = Buffer.from(rows.join('\n'),'utf8');
-                    allSize += buffer.byteLength;
-                    var bufferCompress = compress.encode(fileName, buffer, args.compress);
-                    allSize += bufferCompress.byteLength;
-                    fs.writeFileSync(join(tableCompressDir, fileName + '.zip'), bufferCompress);
-                    fileCount++;
-                    rows = [headers.join('|')]
-                    console.log(i + '/' + total);
+                } catch(e) {
+                    i -= size;
+                    console.error(e.message);
                 }
             }
 
-            var readmeStr = 'TABLE_NAME|TOTAL_COUNT|VERSION|DATE|FILE_COUNT|PART|SIZE\n' + args.table + '|' + total + '|' + newVersion + '|' + new Date().toISOString() + '|' + args.size + '|' + fileCount;
+            var readmeStr = 'TABLE_NAME|TOTAL_COUNT|VERSION|DATE|FILE_COUNT|PART|SIZE\n' + args.table + '|' + total + '|' + newVersion + '|' + new Date().toISOString() + '|' + fileCount + '|' + args.size;
 
             fs.writeFileSync(join(tableDir, 'readme.txt'), readmeStr + '|' + allSize);
+            fs.writeFileSync(join(tableCsvDir, 'readme.txt'), readmeStr + '|' + allCsvSize);
             fs.writeFileSync(join(tableCompressDir, 'readme.txt'), readmeStr + '|' + allCompressSize);
         }
     } catch(e) {
