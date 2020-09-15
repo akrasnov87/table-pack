@@ -52,7 +52,6 @@ exports.auth = async function(baseUrl, login, password) {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     var requestData = json.parse(xhr.responseText);
-                    console.log(requestData.token);
                     resolve(requestData);
                 } else {
                     reject(new Error(xhr.responseText));
