@@ -1,11 +1,19 @@
+/**
+ * Распаковка / Упаковка
+ * @file modules/zip.js
+ * @project table-pack
+ * @author Aleksandr Krasnov
+ */
+
 var AdmZip = require('adm-zip');
 var zlib = require('zlib');
 
 /**
  * Создание архива
+ * @param {string} name имя файла
  * @param {any} data Buffer
  * @param {string} type тип сжатия
- * @returns Buffer
+ * @returns {Buffer} буффер
  */
 exports.encode = function(name, data, type) {
     if(type == 'ZIP') {

@@ -1,7 +1,7 @@
 ### Описание
 
 ```
-node index url=http://localhost login=login password=password table=UI_SV_FIAS size=10000 sort=C_Full_Address compress=ZIP
+node index url=http://localhost login=login password=password table=UI_SV_FIAS size=10000 sort=C_Full_Address compress=ZIP output=c:\inetpub\wwwroot\repo\public
 ```
 
 * url - адрес сервера
@@ -13,6 +13,7 @@ node index url=http://localhost login=login password=password table=UI_SV_FIAS s
 * compress - способ сжатия
 * start - чтение с указаного блока
 * version - версия пакета
+* output - выходной каталог, по умолчанию корневой приложения
 
 #### readme.txt
 
@@ -23,3 +24,25 @@ node index url=http://localhost login=login password=password table=UI_SV_FIAS s
 * FILE_COUNT - количество файлов
 * PART - размер блока
 * SIZE - размер данных в байтах
+
+### Примеры
+
+``UI_SV_FIAS``
+```
+node index "url=http://demo.it-serv.ru/armnext/demo_kavkaz" "login=admin" "password=admin0" "table=UI_SV_FIAS" "size=10000" "sort=C_Full_Address" "compress=ZIP" "output=Z:\\public" "select=LINK,C_Full_Address,C_House_Number,F_Structure,F_Municipality,F_Town"
+```
+
+``ED_Device_Billing``
+```
+node index url=http://demo.it-serv.ru/armnext/demo_kavkaz login=admin password=admin0 table=ED_Device_Billing size=10000 compress=ZIP disabled=0 select="LINK,F_Registr_Pts___LINK,C_Serial_Number,B_EE"
+```
+
+``ED_Network_Routes``
+```
+node index url=http://demo.it-serv.ru/armnext/demo_kavkaz login=admin password=admin0 table=ED_Network_Routes size=10000 compress=ZIP select="LINK,F_Parent,C_Network_Path,F_Prev_Item_Types"
+```
+
+``ED_Registr_Pts``
+```
+node index url=http://demo.it-serv.ru/armnext/demo_kavkaz login=admin password=admin0 table=ED_Registr_Pts size=10000 disabled=0 compress=ZIP select="LINK,C_Name,N_Code,B_EE"
+```
