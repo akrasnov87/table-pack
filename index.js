@@ -12,33 +12,23 @@ var mkdir = require('mkdir-recursive');
 var compress = require('./modules/zip');
 var pkg = require('./package.json');
 var md5 = require('hash-sum');
+var fsUtil = require('./modules/fs-util');
 
 // выполняем оценку загрузки
 (async function() {
     try {
-        //var dir = join(args.output || __dirname, 'json');
-        //var dirJson = join(args.output || __dirname, 'json-zip');
+        var csvZip = join(args.output || __dirname, 'csv-zip');
+        var csvZipItems = await fsUtil.getTables(csvZip);
 
-        //var dirCsv = join(args.output || __dirname, 'csv');
         var dirCsvCompress = join(args.output || __dirname, 'csv-zip');
 
-        var items = [{ "action": "Domain." + args.table, "method": "Query", "data": [{"limit": 1, "forceLimit": true}], "type": "rpc", "tid": 0 }];
-        if(args.sort) {
-            var data = args.sort.split(',');
-            var sorters = [];
-            data.forEach(item => {
-                sorters.push({property: item, direction: "ASC"});
-            });
-            items[0].data[0].sort = sorters;
+        var tablePath = join(__dirname, 'tables', args.table + '.json');
+        if(!fs.existsSync(tablePath)) {
+            return console.log("table " + args.table + " not found");
         }
-
-        if(args.select) {
-            items[0].data[0].select = args.select;
-        }
-
-        if(args.disabled) {
-            items[0].data[0].filter = [{ property: "B_Disabled", value: args.disabled }];
-        }
+        var items = JSON.parse(fs.readFileSync(tablePath).toString());
+        var size = items[0].data[0].limit;
+        items[0].data[0].limit = 1;
         
         var authResult = await rpc.auth(args.url, args.login, args.password);
         var results = await rpc.request(args.url, authResult.token, items);
@@ -59,17 +49,14 @@ var md5 = require('hash-sum');
 
             var tableCompressDir = join(dirCsvCompress, args.table, newVersion);
 
-
             if(!fs.existsSync(tableCompressDir)) {
                 mkdir.mkdirSync(tableCompressDir);
             }
 
-            var size = args.size;
-
             var record = results[0].result.records[0];
             var headers = [];
-            if(args.select) {
-                headers = args.select.split(',');
+            if(items[0].data[0].select) {
+                headers = items[0].data[0].select.split(',');
             } else {
                 for(var i in record) {
                     headers.push(i);
@@ -147,10 +134,19 @@ var md5 = require('hash-sum');
                 }
             }
 
-            var readmeStr = 'TABLE_NAME|TOTAL_COUNT|VERSION|DATE|FILE_COUNT|PART|SIZE|MD5\n' + args.table + '|' + total + '|' + newVersion + '|' + new Date().toISOString() + '|' + fileCount + '|' + args.size;
+            var readmeStr = 'TABLE_NAME|TOTAL_COUNT|VERSION|DATE|FILE_COUNT|PART|SIZE\n' + args.table + '|' + total + '|' + newVersion + '|' + new Date().toISOString() + '|' + fileCount + '|' + size;
 
-            fs.writeFileSync(join(tableCompressDir, 'readme.txt'), readmeStr + '|' + allCsvCompressSize + '|' + md5(md5CsvCompressSize));
+            fs.writeFileSync(join(tableCompressDir, 'readme.txt'), readmeStr + '|' + allCsvCompressSize);
             fs.writeFileSync(join(tableCompressDir, 'md5.txt'), md5CsvCompressSize.join('\n'));
+
+            if(csvZipItems[args.table] && csvZipItems[args.table].length > 0) {
+                var item = csvZipItems[args.table][0];
+                
+                if(item.equal(md5CsvCompressSize)) {
+                    console.log("remove because exists");
+                    deleteFolderRecursive(tableCompressDir);
+                }
+            }
         }
     } catch(e) {
         console.error(e);
@@ -164,4 +160,20 @@ function toMb(num) {
 
 function toPercent(i, j) {
     return (100 - ((j * 100) / i)).toFixed(2);
+}
+
+function deleteFolderRecursive(path) {
+    var files = [];
+    if( fs.existsSync(path) ) {
+        files = fs.readdirSync(path);
+        files.forEach(function(file,index) {
+            var curPath = path + "/" + file;
+            if(fs.lstatSync(curPath).isDirectory()) { // recurse
+                deleteFolderRecursive(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
 }

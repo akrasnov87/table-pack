@@ -1,13 +1,13 @@
 {
   "name": "table-pack",
-  "version": "1.1.927",
+  "version": "1.2.616",
   "birthday": "2020-09-14",
   "description": "Упаковка таблицы в архивы",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Александр Краснов",
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.4.16",
