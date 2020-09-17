@@ -98,7 +98,7 @@ var fsUtil = require('./modules/fs-util');
                                 }
                                 
                                 if(line.toString().indexOf('|') >= 0) {
-                                    line = line.replace(/|/gi, '/');
+                                    line = line.replace(/\|/gi, '/');
                                 }
                                 inner.push(line);
                             }

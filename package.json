@@ -1,6 +1,6 @@
 {
   "name": "table-pack",
-  "version": "1.2.616",
+  "version": "1.3.855",
   "birthday": "2020-09-14",
   "description": "Упаковка таблицы в архивы",
   "main": "index.js",
