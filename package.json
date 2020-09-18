@@ -15,6 +15,7 @@
     "hash-sum": "^2.0.0",
     "json-parser": "^3.1.2",
     "mkdir-recursive": "^0.4.0",
+    "sqlite3": "^5.0.0",
     "xmlhttprequest": "^1.8.0",
     "zlib": "^1.0.5"
   },

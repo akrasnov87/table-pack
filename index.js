@@ -100,6 +100,9 @@ var fsUtil = require('./modules/fs-util');
                                 if(line.toString().indexOf('|') >= 0) {
                                     line = line.replace(/\|/gi, '/');
                                 }
+                                if(line.toString().indexOf('\n') >= 0) {
+                                    line = line.replace(/\n/gi, '');
+                                }
                                 inner.push(line);
                             }
                             rows.push(inner.join('|'));
