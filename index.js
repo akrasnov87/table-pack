@@ -103,11 +103,15 @@ var fsUtil = require('./modules/fs-util');
                                 if(line.toString().indexOf('\n') >= 0) {
                                     line = line.replace(/\n/gi, '');
                                 }
+                                if(line.toString().indexOf('\n') >= 0) {
+                                    line = line.replace(/\r/gi, '');
+                                }
                                 inner.push(line);
                             }
                             rows.push(inner.join('|'));
                             inner = [];
                         }
+
                         var fileName = i + '-' + (i+size);
 
                         var jsonStr = JSON.stringify(records);
