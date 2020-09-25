@@ -103,7 +103,7 @@ var fsUtil = require('./modules/fs-util');
                                 if(line.toString().indexOf('\n') >= 0) {
                                     line = line.replace(/\n/gi, '');
                                 }
-                                if(line.toString().indexOf('\n') >= 0) {
+                                if(line.toString().indexOf('\r') >= 0) {
                                     line = line.replace(/\r/gi, '');
                                 }
                                 inner.push(line);
