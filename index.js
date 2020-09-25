@@ -106,7 +106,7 @@ var fsUtil = require('./modules/fs-util');
                                 if(line.toString().indexOf('\r') >= 0) {
                                     line = line.replace(/\r/gi, '');
                                 }
-                                inner.push(line);
+                                inner.push(line.trim());
                             }
                             rows.push(inner.join('|'));
                             inner = [];
