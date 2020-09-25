@@ -96,14 +96,14 @@ var fsUtil = require('./modules/fs-util');
                                 if(line == undefined || line == null) {
                                     line = '';
                                 }
-                                
-                                if(line.toString().indexOf('|') >= 0) {
+                                line = line.toString();
+                                if(line.indexOf('|') >= 0) {
                                     line = line.replace(/\|/gi, '/');
                                 }
-                                if(line.toString().indexOf('\n') >= 0) {
+                                if(line.indexOf('\n') >= 0) {
                                     line = line.replace(/\n/gi, '');
                                 }
-                                if(line.toString().indexOf('\r') >= 0) {
+                                if(line.indexOf('\r') >= 0) {
                                     line = line.replace(/\r/gi, '');
                                 }
                                 inner.push(line.trim());
