@@ -58,10 +58,8 @@
                      for(var i = 0; i < divisions.length; i++) {
                          var division = divisions[i];
                          
-                         records.push({
-                             division: division,
-                             readme: await readReadme(join(dDir, division.toString()))
-                         });
+                         records.push(await readReadme(join(dDir, division.toString())));
+                         records[records.length - 1]['DIVISION'] = division;
                          records[records.length - 1]['MD5'] = await readMD5(join(dDir, division.toString()));
                          records[records.length - 1].equal = function(array) {
                              for(var i = 0; i < array.length; i++) {
