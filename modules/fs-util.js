@@ -53,7 +53,7 @@
                  var dDir = join(dir, array[i]);
  
                  var divisions = fs.readdirSync(dDir);
-                 if(fs.lstatSync(join(dDir, divisions[0])).isDirectory()) {
+                 if(divisions.length > 0 && fs.lstatSync(join(dDir, divisions[0])).isDirectory()) {
                      // значит division
                      for(var i = 0; i < divisions.length; i++) {
                          var division = divisions[i];
