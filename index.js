@@ -185,7 +185,13 @@ var divisions = [null];
                 fs.writeFileSync(join(tableCompressDir, 'md5.txt'), md5CsvCompressSize.join('\n'));
 
                 if(csvZipItems[args.table] && csvZipItems[args.table].length > 0) {
-                    var item = csvZipItems[args.table][0];
+                    var item = null;
+
+                    if(division == null) {
+                        item = csvZipItems[args.table][0];
+                    } else {
+                        item = csvZipItems[args.table].filter((i)=>{ return i.DIVISION == division.LINK.toString(); })[0];
+                    }
                     
                     if(item.equal(md5CsvCompressSize)) {
                         console.log("remove because exists");
@@ -193,6 +199,13 @@ var divisions = [null];
                     }
                 }
             }
+        }
+
+        var versionFolder = join(dirCsvCompress, args.table, newVersion);
+        var folders = fs.readdirSync(versionFolder);
+        if(folders.length == 0) {
+            console.log(versionFolder + " remove because empty");
+            deleteFolderRecursive(versionFolder);
         }
     } catch(e) {
         console.error(e);

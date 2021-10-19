@@ -51,24 +51,9 @@ node index url=http://demo.it-serv.ru/armnext/demo_kavkaz login=admin password=a
 
 #### для МОЭСК
 
-``UI_SV_FIAS``
-```
-node index url=http://demo.it-serv.ru/armnext/demo_moesk login=admin password=admin0 table=UI_SV_FIAS compress=ZIP
-```
-
-``ED_Device_Billing``
-```
-node index url=http://demo.it-serv.ru/armnext/demo_moesk login=admin password=admin0 table=ED_Device_Billing compress=ZIP
-```
-
 ``ED_Network_Routes``
 ```
-node index url=http://demo.it-serv.ru/armnext/demo_moesk login=admin password=admin0 table=ED_Network_Routes compress=ZIP
-```
-
-``ED_Registr_Pts``
-```
-node index url=http://demo.it-serv.ru/armnext/demo_moesk login=admin password=admin0 table=ED_Registr_Pts compress=ZIP
+node index url=http://demo.it-serv.ru/armnext/demo_moesk login=admin password=admin0 table=ED_Network_Routes compress=ZIP division
 ```
 
 ### для VS Code
