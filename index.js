@@ -192,8 +192,8 @@ var divisions = [null];
                     } else {
                         item = csvZipItems[args.table].filter((i)=>{ return i.DIVISION == division.LINK.toString(); })[0];
                     }
-                    
-                    if(item.equal(md5CsvCompressSize)) {
+
+                    if(item && item.equal(md5CsvCompressSize)) {
                         console.log("remove because exists");
                         deleteFolderRecursive(tableCompressDir);
                     }
