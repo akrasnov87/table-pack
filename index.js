@@ -195,7 +195,7 @@ var divisions = [null];
 
                     if(item && item.equal(md5CsvCompressSize)) {
                         console.log("remove because exists");
-                        deleteFolderRecursive(tableCompressDir);
+                        // deleteFolderRecursive(tableCompressDir);
                     }
                 }
             }
